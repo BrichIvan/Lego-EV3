@@ -1,0 +1,65 @@
+
+scp /home/elliot/Desktop/Practice/Motors_API_2.py robot@ev3dev.local:/home/robot
+
+#!/usr/bin/env python3
+import ev3dev.ev3 as ev3
+import time
+
+//--------------------------------Instant variables-------------------------------------//
+
+left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
+right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
+
+position_sp		// in degrees
+speed_sp
+stop_action
+	STOP_ACTION_HOLD
+	STOP_ACTION_COAST
+	STOP_ACTION_BRAKE
+time_sp			. in millie0seconds
+
+STATE_RUNNING
+STATE_RAMPING
+STATE_HOLDING
+STATE_OVERLOADED
+STATE_STALLED850
+
+//--------------------------------------Methods-----------------------------------------//
+
+left_motor.run_forever(speed_sp = 500)		// degrees per second	100  400  600  800
+
+time.sleep(5.0)
+
+left_motor.stop()
+
+left_motor.run_to_rel_pos ()
+left_motor.run_to_abs_pos ()
+run_timed(time_sp = )
+left_motor.wait_while (ev3.Motor.STATE_RUNNING)
+
+///////////////////////// Example ////////////////////////
+
+left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
+left_motor.speed_sp = 500
+left_motor.time_sp = 3000
+left_motor.stop_action = ev3.Motor.STOP_ACTION_BRAKE
+left_motor.run_timed()
+
+
+
+
+class Snatch3r(object)
+	def drive_inches (self, inches_to_drive, drive_speed_sp):
+		//some code
+
+	def turn_degrees (self, degrees_to turn, turn_speed):
+		//Somr code
+
+	def main():
+
+		assert left_motor.connected
+
+		robot = robo.Snathc3r()
+		for k in range (4);
+			robot.drive_inches(12.400)
+			robot_turn_degrees(90.300)
