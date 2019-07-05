@@ -47,8 +47,6 @@ def initialization():
 def main():
 	initialization()
 	Machine = Robot(400, 200, 40)
-	left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
-	right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
 	for k in range (4):
 		Machine.drive_sm(left_motor, right_motor)
 		time.sleep(0.01)
