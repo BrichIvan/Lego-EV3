@@ -50,7 +50,7 @@ def main():
 		angle = Analsys.read_angle(gy)
 		#Analsys  Sensors.read_accurate_angle()
 		distance = Analsys.read_distance(us)
-		print (str(distance), '/n')
+		print (str(angle), '/n')
 		time.sleep(0.5)
 		#print (str(angle), '/n')
 
