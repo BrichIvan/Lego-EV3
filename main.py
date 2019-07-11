@@ -1,38 +1,20 @@
-from Array import route
-from Array import field
+from Array import Field
 
-#print(field)
+wols = []
+wols.append([2, 1])
+wols.append([3, 1])
+wols.append([5, 3])
+wols.append([3, 0])
+wols.append([4, 3])
+wols.append([2, 4])
+wols.append([2, 5])
+wols.append([2, 3])
 
+map1 = Field(6, 2, 0, 5, 5, wols)
+map1.build_map()
+map1.find_route()
+map1.build_route()
 
-#print(route[12][0])
-
-number = len(route)
-robo_dir = 0
-                            #направления: 0 - вниз, 1 - вправо, 2 - вверх, 3 - вниз
-for n in range(number-1):
-    '''i_n = route[n][0]
-    j_n = route[n][1]'''
-    delta_i = route[n+1][0] - route[n][0]
-    delta_j = route[n+1][1] - route[n][1]
-
-    if delta_i == -1:
-        rout_dir = 2
-    if delta_j == 1:
-        rout_dir = 1
-    if delta_j == -1:
-        rout_dir = 3
-    if delta_i == 1:
-        rout_dir = 0
-
-    if robo_dir % 2 == 0:
-        if (robo_dir + rout_dir) % 4 == 1:
-            print('поворот против часовой стрелки')
-        if (robo_dir + rout_dir) % 4 == 3:
-            print('поворот по часовой')
-    else:
-        if (robo_dir + rout_dir) % 4 == 1:
-            print('поворот по часовой')
-        if (robo_dir + rout_dir) % 4 == 3:
-            print('поворот против часовой стрелки')
-    print('езда вперёд')
-    robo_dir = rout_dir
+print(map1.route)
+print(map1.field)
+print(map1.com)
