@@ -24,33 +24,31 @@ class Sensors(object):
 		millis = int(round(time.time()*1000))
 '''
 
-#def initialization(gy, us):
-	#us = ev3.UltrasonicSensor('in4')
-	#us.mode='US-DIST-CM'	#put the US in the dist in sm mode
+def initialization(gy, us):
+	us = ev3.UltrasonicSensor('in4')
+	us.mode='US-DIST-CM'	#put the US in the dist in sm mode
 
-	#gy = ev3.GyroSensor('in3')
-	#gy.mode = 'GYRO-ANG' #put the gyro into angle mode
-
-	#assert gy.connected
-	#assert us.connected
-
-def main():
-	gy = ev3.GyroSensor(ev3.INPUT_3)
-	gy.mode = 'GYRO-ANG'
-	
-	us = ev3.UltrasonicSensor()
-	us.mode = 'US-DIST-CM'
+	gy = ev3.GyroSensor('in3')
+	gy.mode = 'GYRO-ANG' #put the gyro into angle mode
 
 	assert gy.connected
 	assert us.connected
+	while (not(gy.value() = 0)):
+		pass
+	gy.mode = 'GYRO-ANG'
 
-	#initialization(gy, us)
+def main():
+	gy = ev3.GyroSensor(ev3.INPUT_3)
+	us = ev3.UltrasonicSensor()
+	initialization(gy, us)
+	
+	
 	Analsys = Sensors(0, 0)
 	while (True):
 		angle = Analsys.read_angle(gy)
 		#Analsys  Sensors.read_accurate_angle()
 		distance = Analsys.read_distance(us)
-		print (str(angle), '/n')
+		print (str(distance))
 		time.sleep(0.5)
 		#print (str(angle), '/n')
 

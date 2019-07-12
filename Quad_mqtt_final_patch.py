@@ -10,7 +10,7 @@ class Robot(object):
 		self.sm = sm
 		self.angle = angle
 
-	def drive_sm (self, sm, left_motor, right_motor, gy, us, a):
+	def drive_sm (self, sm, left_motor, right_motor, gy, us):
 		distance_ang = sm * -20.5
 		left_motor.position_sp = distance_ang
 		right_motor.position_sp = distance_ang
@@ -21,17 +21,13 @@ class Robot(object):
 		right_motor.run_to_rel_pos()
 
 		while (left_motor.is_running or right_motor.is_running):
-			# distance = us.value()
-			# self.angle = gy.value()
+			distance = us.value()
+			self.angle = gy.value()
 			# a["data"] = [str(distance), str(self.angle)]
 			# print (a["data"][0] + ' ' + a["data"][1])
+			pass
 
-			in_out_data["distance"] = us.value()
-			in_out_data["angle"] = gy.value()
-			data = str(in_out_data["distance"]) + " " + str(in_out_data["angle"])
-			lego.publish(pub_topic, data, 0)
-
-	def rotate_angle (self, angle, left_motor, right_motor, gy, us, a):
+	def rotate_angle (self, angle, left_motor, right_motor, gy, us):
 		k = 0.035
 		angle = angle + self.angle
 		if (self.angle > angle):
@@ -41,14 +37,11 @@ class Robot(object):
 			right_motor.run_forever()
 
 			while (gy.value() >= (angle + k*self.speed_ang)):
-				# distance = us.value()
-				# self.angle = gy.value()
+				distance = us.value()
+				self.angle = gy.value()
 				# a["data"] = [str(distance), str(self.angle)]
 				# print (a["data"][0] + ' ' + a["data"][1])
-				in_out_data["distance"] = us.value()
-				in_out_data["angle"] = gy.value()
-				data = str(in_out_data["distance"]) + " " + str(in_out_data["angle"])
-				lego.publish(pub_topic, data, 0)
+				pass
 		else:
 			left_motor.speed_sp = -1 * self.speed_ang
 			right_motor.speed_sp = self.speed_ang
@@ -57,14 +50,11 @@ class Robot(object):
 			right_motor.run_forever()
 
 			while (gy.value() <= (angle - k*self.speed_ang)):
-				# distance = us.value()
-				# self.angle = gy.value()
+				distance = us.value()
+				self.angle = gy.value()
 				# a["data"] = [str(distance), str(self.angle)]
 				# print (a["data"][0] + ' ' + a["data"][1])
-				in_out_data["distance"] = str(us.value())
-				in_out_data["angle"] = str(gy.value())
-				data = in_out_data["distance"] + " " + in_out_data["angle"]
-				lego.publish(pub_topic, data, 0)
+				pass
 
 		left_motor.stop()
 		right_motor.stop()
@@ -73,15 +63,15 @@ class Robot(object):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("Connected")
-	else
+		userdata = str(lego_id)
+	else:
 		print("Connection status:", rc)
 
 def on_message(client, userdata, msg):
 	message = msg.payload.decode()
-    message = message.strip().split()
-	message = list(map(int, message))
-    userdata["command"] = str(message[0])
-    userdata["arg"] = str(message[1])
+	message = list(map(int, message.split(" ")))
+	userdata["command"] = str(message[0])
+	userdata["arg"] = str(message[1])
 
 def on_publish(client, userdata, mid):
     print("Published ID:", mid)
@@ -98,6 +88,11 @@ def on_disconnect(client, userdata, rc):
     else:
         print("Disconnected")
 # ---------------------------------------
+def send(in_out_data, us, gy, pub_topic, lego):
+	in_out_data["distance"] = str(us.value())
+	in_out_data["angle"] = str(gy.value())
+	data = in_out_data["distance"] + " " + in_out_data["angle"]
+	lego.publish(pub_topic, data, 0)
 
 def initialization():
 	left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
@@ -116,14 +111,14 @@ def initialization():
 	us.mode = 'US-DIST-CM'  #put the US in the dist in sm mode
 	gy.mode = 'GYRO-RATE'
 	gy.mode = 'GYRO-ANG' #put the gyro into angule
-	
+
 	while (not(gy.value() == 0)) :
 		pass
 	gy.mode = 'GYRO-ANG'
 
 lego_id = 1
-server_ip = str(10.42.0.1)
-in_out_data = {"command": " ", "arg": " ", "distance": " ", "angle": " "}
+server_ip = ("192.168.43.152")
+in_out_data = {"command": "0", "arg": "0", "distance": " ", "angle": " "}
 
 def main():
 	# hardware initialization
@@ -134,10 +129,11 @@ def main():
 	us = ev3.UltrasonicSensor(ev3.INPUT_4)
 
 	# MQTT initialization
+	connstat = "0"
 	pub_topic = "Sensors/" + str(lego_id)
 	sub_topic = "Command/" + str(lego_id)
 	lego = mqtt.Client()
-	lego.user_data_set(in_out_data)
+	lego.user_data_set(connstat)
 	lego.on_connect = on_connect
 	lego.on_message = on_message
 	lego.on_publish = on_publish
@@ -145,11 +141,15 @@ def main():
 	lego.on_disconnect = on_disconnect
 	lego.on_unsubscribe = on_unsubscribe
 	lego.connect(server_ip, 1883, 60)
+	while connstat == 0:
+		pass
+	lego.publish("ConnStat/", str(lego_id), 0)
+	del(connstat)
+	lego.user_data_set(in_out_data)
 	lego.subscribe(sub_topic, 0)
 	lego.loop_start()
 
 	print('Ready')
-
 	Machine = Robot(200, 100, 0, 0)
 	#Machine.rotate_angle(-10, left_motor, right_motor, gy, us, a)
 	while (1):
@@ -158,16 +158,25 @@ def main():
 		command = command.strip().split()
 		command = list(map(int, command))
 
-		if command[0] == 0:
-			x = command[1]
-			#print(x)
-			Machine.rotate_angle(x, left_motor, right_motor, gy, us, a)
-		else:
-			y = command[1]
-			#print (y)
-			Machine.drive_sm(y, left_motor, right_motor, gy, us, a)
+		if command[1] != 0:
+
+			if command[0] == 0:
+				x = command[1]
+				#print(x)
+				Machine.rotate_angle(x, left_motor, right_motor, gy, us)
+				send(in_out_data, us, gy, pub_topic, lego)
+				in_out_data["command"] = "0"
+				in_out_data["arg"] = "0"
+			else:
+				y = command[1]
+				#print (y)
+				Machine.drive_sm(y, left_motor, right_motor, gy, us)
+				send(in_out_data, us, gy, pub_topic, lego)
+				in_out_data["command"] = "0"
+				in_out_data["arg"] = "0"
+		#Transmit to MQTT
+		#send(in_out_data, us, gy, pub_topic, lego)
 
 		time.sleep(0.2)
-
 
 main()

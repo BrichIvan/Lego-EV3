@@ -26,11 +26,6 @@ class Robot(object):
 			# a["data"] = [str(distance), str(self.angle)]
 			# print (a["data"][0] + ' ' + a["data"][1])
 
-			in_out_data["distance"] = us.value()
-			in_out_data["angle"] = gy.value()
-			data = str(in_out_data["distance"]) + " " + str(in_out_data["angle"])
-			lego.publish(pub_topic, data, 0)
-
 	def rotate_angle (self, angle, left_motor, right_motor, gy, us, a):
 		k = 0.035
 		angle = angle + self.angle
@@ -45,10 +40,6 @@ class Robot(object):
 				# self.angle = gy.value()
 				# a["data"] = [str(distance), str(self.angle)]
 				# print (a["data"][0] + ' ' + a["data"][1])
-				in_out_data["distance"] = us.value()
-				in_out_data["angle"] = gy.value()
-				data = str(in_out_data["distance"]) + " " + str(in_out_data["angle"])
-				lego.publish(pub_topic, data, 0)
 		else:
 			left_motor.speed_sp = -1 * self.speed_ang
 			right_motor.speed_sp = self.speed_ang
@@ -61,10 +52,7 @@ class Robot(object):
 				# self.angle = gy.value()
 				# a["data"] = [str(distance), str(self.angle)]
 				# print (a["data"][0] + ' ' + a["data"][1])
-				in_out_data["distance"] = str(us.value())
-				in_out_data["angle"] = str(gy.value())
-				data = in_out_data["distance"] + " " + in_out_data["angle"]
-				lego.publish(pub_topic, data, 0)
+				
 
 		left_motor.stop()
 		right_motor.stop()
@@ -73,7 +61,7 @@ class Robot(object):
 def on_connect(client, userdata, flags, rc):
 	if rc == 0:
 		print("Connected")
-	else
+	else:
 		print("Connection status:", rc)
 
 def on_message(client, userdata, msg):
@@ -122,7 +110,7 @@ def initialization():
 	gy.mode = 'GYRO-ANG'
 
 lego_id = 1
-server_ip = str(10.42.0.1)
+server_ip = str(192.168.43.152)
 in_out_data = {"command": " ", "arg": " ", "distance": " ", "angle": " "}
 
 def main():
@@ -166,8 +154,12 @@ def main():
 			y = command[1]
 			#print (y)
 			Machine.drive_sm(y, left_motor, right_motor, gy, us, a)
-
+		#Transmit to MQTT
+		in_out_data["distance"] = str(us.value())
+		in_out_data["angle"] = str(gy.value())
+		data = in_out_data["distance"] + " " + in_out_data["angle"]
+		lego.publish(pub_topic, data, 0)
+		
 		time.sleep(0.2)
-
 
 main()
