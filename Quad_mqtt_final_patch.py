@@ -11,7 +11,7 @@ class Robot(object):
 		self.angle = angle
 
 	def drive_sm (self, sm, left_motor, right_motor, gy, us):
-		distance_ang = sm * -20.5
+		distance_ang = sm * -20.5  # 360/(2*pi*R), R = 2,8 sm
 		left_motor.position_sp = distance_ang
 		right_motor.position_sp = distance_ang
 		left_motor.speed_sp = self.speed
@@ -25,7 +25,6 @@ class Robot(object):
 			self.angle = gy.value()
 			# a["data"] = [str(distance), str(self.angle)]
 			# print (a["data"][0] + ' ' + a["data"][1])
-			pass
 
 	def rotate_angle (self, angle, left_motor, right_motor, gy, us):
 		k = 0.035
@@ -74,27 +73,29 @@ def on_message(client, userdata, msg):
 	userdata["arg"] = str(message[1])
 
 def on_publish(client, userdata, mid):
-    print("Published ID:", mid)
+	print("Published ID:", mid)
 
 def on_subscribe(client, userdata, mid, granted_qos):
-    print("Subscribed ID:", mid)
+	print("Subscribed ID:", mid)
 
 def on_unsubscribe(client, userata, mid):
-    print("Unsubscribed ID:", mid)
+	print("Unsubscribed ID:", mid)
 
 def on_disconnect(client, userdata, rc):
-    if rc != 0:
-        print("Unexpected disconnection:", rc)
-    else:
-        print("Disconnected")
+	if rc != 0:
+		print("Unexpected disconnection:", rc)
+	else:
+		print("Disconnected")
 # ---------------------------------------
 def send(in_out_data, us, gy, pub_topic, lego):
 	in_out_data["distance"] = str(us.value())
 	in_out_data["angle"] = str(gy.value())
 	data = in_out_data["distance"] + " " + in_out_data["angle"]
-	lego.publish(pub_topic, data, 0)
+	lego.publish(pub_topic, data, 2)
 
 def initialization():
+	global left_motor, right_motor, gy, us
+
 	left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
 	right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
 	gy = ev3.GyroSensor(ev3.INPUT_3)
@@ -105,8 +106,11 @@ def initialization():
 	assert gy.connected
 	assert us.connected
 
-	left_motor.stop_action = ev3.Motor.STOP_ACTION_BRAKE
-	right_motor.stop_action = ev3.Motor.STOP_ACTION_BRAKE
+	# left_motor.stop_action = ev3.Motor.STOP_ACTION_BRAKE
+	# right_motor.stop_action = ev3.Motor.STOP_ACTION_BRAKE
+
+	left_motor.stop_action = ev3.Motor.STOP_ACTION_HOLD
+	right_motor.stop_action = ev3.Motor.STOP_ACTION_HOLD
 
 	us.mode = 'US-DIST-CM'  #put the US in the dist in sm mode
 	gy.mode = 'GYRO-RATE'
@@ -116,19 +120,9 @@ def initialization():
 		pass
 	gy.mode = 'GYRO-ANG'
 
-lego_id = 1
-server_ip = ("192.168.43.152")
-in_out_data = {"command": "0", "arg": "0", "distance": " ", "angle": " "}
+def mqtt_init():
+	global pub_topic, sub_topic, lego
 
-def main():
-	# hardware initialization
-	initialization()
-	left_motor = ev3.LargeMotor(ev3.OUTPUT_B)
-	right_motor = ev3.LargeMotor(ev3.OUTPUT_C)
-	gy = ev3.GyroSensor(ev3.INPUT_3)
-	us = ev3.UltrasonicSensor(ev3.INPUT_4)
-
-	# MQTT initialization
 	connstat = "0"
 	pub_topic = "Sensors/" + str(lego_id)
 	sub_topic = "Command/" + str(lego_id)
@@ -143,15 +137,23 @@ def main():
 	lego.connect(server_ip, 1883, 60)
 	while connstat == 0:
 		pass
-	lego.publish("ConnStat/", str(lego_id), 0)
+	lego.publish("ConnStat/", str(lego_id), 2)
 	del(connstat)
 	lego.user_data_set(in_out_data)
-	lego.subscribe(sub_topic, 0)
+	lego.subscribe(sub_topic, 2)
 	lego.loop_start()
 
+lego_id = 1
+server_ip = ("10.42.0.1")
+in_out_data = {"command": "0", "arg": "0", "distance": " ", "angle": " "}
+
+def main():
+	# hardware and mqtt initialization
+	initialization()
+	mqtt_init()
 	print('Ready')
+
 	Machine = Robot(200, 100, 0, 0)
-	#Machine.rotate_angle(-10, left_motor, right_motor, gy, us, a)
 	while (1):
 		# Listen to MQTT
 		command = str(in_out_data["command"]) + " " + str(in_out_data["arg"])
@@ -174,9 +176,10 @@ def main():
 				send(in_out_data, us, gy, pub_topic, lego)
 				in_out_data["command"] = "0"
 				in_out_data["arg"] = "0"
+
+		time.sleep(0.1)
+
 		#Transmit to MQTT
 		#send(in_out_data, us, gy, pub_topic, lego)
-
-		time.sleep(0.2)
 
 main()
