@@ -2,13 +2,13 @@ from Array import Field
 import paho.mqtt.client as mqtt
 import time
 
-
+#  MQTT functions
 def on_connect(myPC, userdata, flags, rc):
     print("Connected")
 
 
 def on_message(myPC, userdata, msg):
-    global ready_for_action, map1, map2, queue1, queue2, position_1, position_2
+    global ready_for_action, map1, map2, position_1, position_2
     message = msg.payload.decode()
     print("Topic:", msg.topic)
     a = list(map(int, message.split()))
@@ -18,49 +18,18 @@ def on_message(myPC, userdata, msg):
         userdata["angle/1"] = a[1]
         if a[0] < 225:
             if position_1["direct"] == 0:
-                map1.add_wall(position_1["i"] + 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
-                map2.add_wall(position_1["i"] + 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
+            	map1.add_wall(position_1["i"] + 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
+            	map2.add_wall(position_1["i"] + 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
             if position_1["direct"] == 2:
                 map1.add_wall(position_1["i"] - 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
                 map2.add_wall(position_1["i"] - 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
             if position_1["direct"] == 1:
                 map1.add_wall(position_1["i"], position_1["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
                 map2.add_wall(position_1["i"], position_1["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
             if position_1["direct"] == 3:
                 map1.add_wall(position_1["i"], position_1["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
                 map2.add_wall(position_1["i"], position_1["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
+            struct_route(map1, map2)
     if msg.topic == "Sensors/2":
         ready_for_action["Robot2"] = 1
         userdata["dist/2"] = a[0]
@@ -68,48 +37,17 @@ def on_message(myPC, userdata, msg):
         if a[0] < 225:
             if position_2["direct"] == 0:
                 map2.add_wall(position_2["i"] + 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
                 map1.add_wall(position_2["i"] + 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
             if position_2["direct"] == 2:
                 map2.add_wall(position_2["i"] - 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
                 map1.add_wall(position_2["i"] - 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
             if position_2["direct"] == 1:
                 map2.add_wall(position_2["i"], position_2["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
                 map1.add_wall(position_2["i"], position_2["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
             if position_2["direct"] == 3:
                 map2.add_wall(position_2["i"], position_2["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
-                queue2 = map2.com
-                queue2 = list(map(str, queue2.split(",")))
-                queue2.pop()
-                queue2.reverse()
                 map1.add_wall(position_2["i"], position_2["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
-                queue1 = map1.com
-                queue1 = list(map(str, queue1.split(",")))
-                queue1.pop()
-                queue1.reverse()
+            struct_route(map1, map2)
     print(userdata)
 
 
@@ -141,6 +79,18 @@ def conn_call(myPC, userdata, msg):
         conn["Robot1"] = 1
     if message == "2":
         conn["Robot2"] = 2
+#  ------------------------------
+
+def struct_route(map1, map2):
+	global queue1, queue2
+	queue1 = map1.com
+	queue1 = list(map(str, queue1.split(",")))
+	queue1.pop()
+	queue1.reverse()
+	queue2 = map2.com
+	queue2 = list(map(str, queue2.split(",")))
+	queue2.pop()
+	queue2.reverse()
 
 
 #  mqtt initialization
@@ -160,14 +110,14 @@ myPC.on_disconnect = on_disconnect
 myPC.on_unsubscribe = on_unsubscribe
 
 #  connection
-myPC.connect("10.42.0.1", 1883, 60)
+myPC.connect("192.168.43.152", 1883, 60)
 myPC.subscribe("ConnStat/", 2)
 myPC.message_callback_add("ConnStat/", conn_call)
 myPC.loop_start()
 
 print("Waiting until connection...")
-while conn["Robot1"] == 0:  # or conn["Robot2"] == 0:
-    pass
+# while conn["Robot1"] == 0:  # or conn["Robot2"] == 0:
+#    pass
 
 myPC.message_callback_remove("ConnStat/")
 print("All robots connected!")
@@ -183,30 +133,24 @@ position_2 = {"i": 1, "j": 5, "direct": 0}
 #  set end points
 position_end_1 = {"i": 5, "j": 5}
 position_end_2 = {"i": 4, "j": 4}
-#  set known walls
-walls = []
+#  set known walls and cubes
+# walls = []
+walls = [[2, 1], [3, 1], [5, 3], [3, 0], [4, 3], [2, 4], [2, 5], [2, 3]]
+cubes = [[1, 2], [5, 4], [4, 5]]
 
 ready_for_action["Robot1"] = 1
 ready_for_action["Robot2"] = 1
 
 #  initial route sending
-map1 = Field(rang, position_1["i"], position_1["j"], position_end_1["i"], position_end_1["j"], position_1["direct"], walls)
+map1 = Field(rang, position_1["i"], position_1["j"], position_end_1["i"], position_end_1["j"], position_1["direct"], walls, cubes)
 map1.build_map()
 map1.find_route()
 map1.build_route()
-queue1 = map1.com
-queue1 = list(map(str, queue1.split(",")))
-queue1.pop()
-queue1.reverse()
-
-map2 = Field(rang, position_2["i"], position_2["j"], position_end_2["i"], position_end_2["j"], position_2["direct"], walls)
+map2 = Field(rang, position_2["i"], position_2["j"], position_end_2["i"], position_end_2["j"], position_2["direct"], walls, cubes)
 map2.build_map()
 map2.find_route()
 map2.build_route()
-queue2 = map2.com
-queue2 = list(map(str, queue2.split(",")))
-queue2.pop()
-queue2.reverse()
+struct_route(map1, map2)
 
 
 #  main cycle
