@@ -306,11 +306,15 @@ while True:
                 if ((position_1["i"] == previous_2["i"]) and (position_1["j"] == previous_2["j"])) or ((position_1["i"] == position_2["i"]) and (position_1["j"] == position_2["j"])):
                     collision = True
                     ready_for_action["Robot1"] = 1
+            elif k == "5 0" or k == "0 90" or k == "0 -90":
+                previous_1["i"] = position_1["i"]
+                previous_1["j"] = position_1["j"]   
 
             if not collision:
                 queue1.pop()
                 myPC.publish("Command/1", k, 2)
                 myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]), 2)
+
         else:
             previous_1["i"] = position_1["i"]
             previous_1["j"] = position_1["j"]
@@ -347,6 +351,9 @@ while True:
                 if ((position_2["i"] == previous_1["i"]) and (position_2["j"] == previous_1["j"])) or ((position_2["i"] == position_1["i"]) and (position_2["j"] == position_1["j"])):
                     collision = True
                     ready_for_action["Robot2"] = 1
+            elif k == "5 0" or k == "0 90" or k == "0 -90":
+                previous_2["i"] = position_2["i"]
+                previous_2["j"] = position_2["j"]   
 
             if not collision:
                 queue2.pop()
