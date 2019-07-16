@@ -48,7 +48,7 @@ myPC.on_disconnect = on_disconnect
 myPC.on_unsubscribe = on_unsubscribe
 
 #  connection
-myPC.connect("10.42.0.1", 1883, 60)
+myPC.connect("192.168.43.152", 1883, 60)
 myPC.loop_start()
 myPC.subscribe("Position/1", 2)
 myPC.subscribe("Position/2", 2)
@@ -180,6 +180,7 @@ class Mapping(object):
         r = int(tr)
         map1 = Field(r, self.i_st1, self.j_st1, self.i_fin1, self.j_fin1, 0, wols, cubes)
         map2 = Field(r, self.i_st2, self.j_st2, self.i_fin2, self.j_fin2, 0, wols, cubes)
+        a = str(r)+";"+str(self.i_st1)+";"+str(self.j_st1)+";"+str(self.i_fin1)+";"+str(self.j_fin1)+";"+str(0)+";" + str(self.i_st2) + ";" + str(self.j_st2) + ";" + str(self.i_fin2) + ";" + str(self.j_fin2) + ";" + str(0)+";"+str(wols)+";"+str(cubes)
 
         map1.build_map()
         map1.find_route()
