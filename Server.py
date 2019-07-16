@@ -10,7 +10,6 @@ def on_connect(myPC, userdata, flags, rc):
 def on_message(myPC, userdata, msg):
     global ready_for_action, map1, map2, position_1, position_2, wall_send, walls
     message = msg.payload.decode()
-    print("Topic:", msg.topic)
     message = list(map(int, message.split()))
     if msg.topic == "Sensors/1":
         ready_for_action["Robot1"] = 1
@@ -145,8 +144,8 @@ def conn_call(myPC, userdata, msg):
 def map_call(myPC, userdata, msg):
     global rang, position_1, position_2, position_end_1, position_end_2, walls, cubes, init_set
     message = msg.payload.decode()
-    message = list(map(int, message.split(";")))
-    rang = message[0]
+    message = list(map(str, message.split(";")))
+    rang = int(message[0])
     position_1["i"] = int(message[1])
     position_1["j"] = int(message[2])
     position_end_1["i"] = int(message[3])
@@ -261,6 +260,9 @@ previous_1["j"] = position_1["j"]
 while init_set == 0:
    pass
 
+previous_1["i"] = position_1["i"]
+previous_1["j"] = position_1["j"]
+
 print("Vizualization imported")
 ready_for_action["Robot1"] = 1
 ready_for_action["Robot2"] = 1
@@ -275,6 +277,12 @@ map2.build_map()
 map2.find_route()
 map2.build_route()
 struct_route(map1, map2)
+print(map1.field)
+print(queue1)
+print()
+print(map2.field)
+print(queue2)
+print()
 
 #  main cycle
 while True:
@@ -311,7 +319,7 @@ while True:
                 if ((position_1["i"] == previous_2["i"]) and (position_1["j"] == previous_2["j"])) or ((position_1["i"] == position_2["i"]) and (position_1["j"] == position_2["j"])):
                     collision = True
                     ready_for_action["Robot1"] = 1
-            elif k == "5 0" or k == "0 90" or k == "0 -90":
+            elif k == "5 1" or k == "0 90" or k == "0 -90":
                 previous_1["i"] = position_1["i"]
                 previous_1["j"] = position_1["j"]   
 
@@ -327,7 +335,7 @@ while True:
     if ready_for_action["Robot2"] == 1:
         if len(queue2) > 0:
             ready_for_action["Robot2"] = 0
-            k = queue1[len(queue1)-1]
+            k = queue2[len(queue2)-1]
             collision = False
             if k == "1 20" and position_2["direct"] == 0:
                 previous_2["i"] = position_2["i"]
@@ -356,7 +364,7 @@ while True:
                 if ((position_2["i"] == previous_1["i"]) and (position_2["j"] == previous_1["j"])) or ((position_2["i"] == position_1["i"]) and (position_2["j"] == position_1["j"])):
                     collision = True
                     ready_for_action["Robot2"] = 1
-            elif k == "5 0" or k == "0 90" or k == "0 -90":
+            elif k == "5 1" or k == "0 90" or k == "0 -90":
                 previous_2["i"] = position_2["i"]
                 previous_2["j"] = position_2["j"]   
 
@@ -372,3 +380,7 @@ while True:
         wall_send = 0
         k = str(walls[len(walls)-1][0]) + " " + str(walls[len(walls)-1][1])
         myPC.publish("Walls/", k, 2)
+
+    if init_set == 1:
+    	init_set = 0
+    	

@@ -23,7 +23,7 @@ class Field(object):
         self.direct = direct
         self.com = ''
         self.turns_after_calibration = 0
-        self.min_turns_for_calibration = 1
+        self.min_turns_for_calibration = 3
 
     #  направления: 0 - вниз, 1 - вправо, 2 - вверх, 3 - влево
 
@@ -235,6 +235,7 @@ class Field(object):
             flaag = False
             self.turns_after_calibration += 1
             if self.turns_after_calibration > self.min_turns_for_calibration:
+            	self.turns_after_calibration = 0
                 if self.route[n + 1][0] > 0:
                     if self.field[self.route[n + 1][0] - 1, self.route[n + 1][1]] == -3:
                         self.turns_after_calibration = 0
@@ -288,7 +289,7 @@ class Field(object):
                     self.com += '0 -90,'
                     self.com += '0 -90,'
 
-                self.com += '5 0,'
+                self.com += '5 1,'
                 self.direct = cal_dir
 
     #  команды 1 (1 20) - вперёд 20 см, 2 (0 90) - по часовой, 3 (0 -90) - против часовой
