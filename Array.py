@@ -2,7 +2,7 @@ import numpy as np
 
 
 class Field(object):
-    def __init__(self, rang, i_st, j_st, i_fin, j_fin, direct, walls):
+    def __init__(self, rang, i_st, j_st, i_fin, j_fin, direct, walls, cubes):
         self.rang = rang
         self.i_st = i_st
         self.j_st = j_st
@@ -15,10 +15,14 @@ class Field(object):
                 self.field[i][j] = -2
         self.field[self.i_st, self.j_st] = 1
         self.field[self.i_fin, self.j_fin] = -1
-        for p in walls:
-            self.field[p[0]][p[1]] = 0
+        for i in walls:
+            self.field[i[0]][i[1]] = 0
+        for i in cubes:
+            self.field[i[0]][i[1]] = -3
         self.direct = direct
         self.com = ''
+        self.turns_after_calibration = 0
+        self.min_turns_for_calibration = 1
 
     #  направления: 0 - вниз, 1 - вправо, 2 - вверх, 3 - влево
 
@@ -214,6 +218,68 @@ class Field(object):
 
     #  команды 1 (1 20) - вперёд 20 см, 2 (0 90) - по часовой, 3 (0 -90) - против часовой
 
+            #  check for cubes
+            flaag = False
+            self.turns_after_calibration += 1
+            if self.turns_after_calibration > self.min_turns_for_calibration:
+                if self.route[n + 1][0] > 0:
+                    if self.field[self.route[n + 1][0] - 1, self.route[n + 1][1]] == -3:
+                        self.turns_after_calibration = 0
+                        i_cube = self.route[n + 1][0] - 1
+                        j_cube = self.route[n + 1][1]
+                        flaag = True
+                if self.route[n + 1][1] > 0:
+                    if self.field[self.route[n + 1][0], self.route[n + 1][1] - 1] == -3:
+                        self.turns_after_calibration = 0
+                        i_cube = self.route[n + 1][0]
+                        j_cube = self.route[n + 1][1] - 1
+                        flaag = True
+                if self.route[n + 1][1] < self.rang - 1:
+                    if self.field[self.route[n + 1][0], self.route[n + 1][1] + 1] == -3:
+                        self.turns_after_calibration = 0
+                        i_cube = self.route[n + 1][0]
+                        j_cube = self.route[n + 1][1] + 1
+                        flaag = True
+                if self.route[n + 1][0] < self.rang - 1:
+                    if self.field[self.route[n + 1][0] + 1, self.route[n + 1][1]] == -3:
+                        self.turns_after_calibration = 0
+                        i_cube = self.route[n + 1][0] + 1
+                        j_cube = self.route[n + 1][1]
+                        flaag = True
+
+            if flaag:
+                delta_i = self.route[n + 1][0] - i_cube
+                delta_j = self.route[n + 1][1] - j_cube
+                if delta_i == -1:
+                    cal_dir = 2
+                elif delta_j == 1:
+                    cal_dir = 1
+                elif delta_j == -1:
+                    cal_dir = 3
+                elif delta_i == 1:
+                    cal_dir = 0
+
+                if self.direct % 2 == 0:
+                    if (self.direct + cal_dir) % 4 == 1:
+                        self.com += '0 -90,'
+                    if (self.direct + cal_dir) % 4 == 3:
+                        self.com += '0 90,'
+
+                if self.direct % 2 != 0:
+                    if (self.direct + cal_dir) % 4 == 1:
+                        self.com += '0 90,'
+                    if (self.direct + cal_dir) % 4 == 3:
+                        self.com += '0 -90,'
+
+                if (cal_dir != self.direct) and ((self.direct + cal_dir) % 2 == 0):
+                    self.com += '0 -90,'
+                    self.com += '0 -90,'
+
+                self.com += '5 0,'
+                self.direct = cal_dir
+
+    #  команды 1 (1 20) - вперёд 20 см, 2 (0 90) - по часовой, 3 (0 -90) - против часовой
+
     def add_wall(self, i_wal, j_wal, i_cur, j_cur, direct):
         self.field[i_wal, j_wal] = 0
         for i in range(self.rang):
@@ -281,40 +347,4 @@ class Field(object):
                         self.route[n+1][1] = self.route[n+1][1]-1
                 delta_i_0 = self.route[n+1][0] - self.route[n][0]
                 delta_j_0 = self.route[n+1][1] - self.route[n][1]
-    '''
-
-    ''' #  old version
-    def find_route(self):
-        i_cur = self.i_fin
-        j_cur = self.j_fin
-        self.route = []
-        self.route.append([i_cur, j_cur])
-        min = 0
-        while min != 1:
-            min = 0
-            if i_cur > 0:
-                if ((min == 0) or (self.field[i_cur - 1, j_cur] < min)) and (self.field[i_cur - 1, j_cur] > 0):
-                    min = self.field[i_cur - 1, j_cur]
-                    i_min = i_cur - 1
-                    j_min = j_cur
-            if i_cur < self.rang - 1:
-                if ((min == 0) or (self.field[i_cur + 1, j_cur] < min)) and (self.field[i_cur + 1, j_cur] > 0):
-                    min = self.field[i_cur + 1, j_cur]
-                    i_min = i_cur + 1
-                    j_min = j_cur
-            if j_cur > 0:
-                if ((min == 0) or (self.field[i_cur, j_cur - 1] < min)) and (self.field[i_cur, j_cur - 1] > 0):
-                    min = self.field[i_cur, j_cur - 1]
-                    i_min = i_cur
-                    j_min = j_cur - 1
-            if j_cur < self.rang - 1:
-                if ((min == 0) or (self.field[i_cur, j_cur + 1] < min)) and (self.field[i_cur, j_cur + 1] > 0):
-                    min = self.field[i_cur, j_cur + 1]
-                    i_min = i_cur
-                    j_min = j_cur + 1
-            i_cur = i_min
-            j_cur = j_min
-
-            self.route.append([i_cur, j_cur])
-        self.route.reverse()
     '''
