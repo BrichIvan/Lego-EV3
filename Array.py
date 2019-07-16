@@ -10,6 +10,7 @@ class Field(object):
         self.j_fin = j_fin
         self.field = np.zeros((self.rang, self.rang), dtype=int)
         self.route = []
+        self.ano = []
         for i in range(self.rang):
             for j in range(self.rang):
                 self.field[i][j] = -2
@@ -40,25 +41,37 @@ class Field(object):
                         if i > 0:
                             if (self.field[i - 1, j] == -2) or (
                                     (self.field[i - 1, j] > 0) and (self.field[i - 1, j] > self.field[i, j])):
-                                self.field[i - 1, j] = self.field[i, j] + 1
+                                if [i - 1, j] in self.ano:
+                                    self.field[i - 1, j] = self.field[i, j] + 3
+                                else:
+                                    self.field[i - 1, j] = self.field[i, j] + 1
                             if self.field[i - 1, j] == -1:
                                 fl = 0
                         if i < self.rang - 1:
                             if (self.field[i + 1, j] == -2) or (
                                     (self.field[i + 1, j] > 0) and (self.field[i + 1, j] > self.field[i, j])):
-                                self.field[i + 1, j] = self.field[i, j] + 1
+                                if [i + 1, j] in self.ano:
+                                    self.field[i + 1, j] = self.field[i, j] + 3
+                                else:
+                                    self.field[i + 1, j] = self.field[i, j] + 1
                             if self.field[i + 1, j] == -1:
                                 fl = 0
                         if j > 0:
                             if (self.field[i, j - 1] == -2) or (
                                     (self.field[i, j - 1] > 0) and (self.field[i, j - 1] > self.field[i, j])):
-                                self.field[i, j - 1] = self.field[i, j] + 1
+                                if [i, j - 1] in self.ano:
+                                    self.field[i, j - 1] = self.field[i, j] + 3
+                                else:
+                                    self.field[i, j - 1] = self.field[i, j] + 1
                             if self.field[i, j - 1] == -1:
                                 fl = 0
                         if j < self.rang - 1:
                             if (self.field[i, j + 1] == -2) or (
                                     (self.field[i, j + 1] > 0) and (self.field[i, j + 1] > self.field[i, j])):
-                                self.field[i, j + 1] = self.field[i, j] + 1
+                                if [i, j + 1] in self.ano:
+                                    self.field[i, j + 1] = self.field[i, j] + 3
+                                else:
+                                    self.field[i, j + 1] = self.field[i, j] + 1
                             if self.field[i, j + 1] == -1:
                                 fl = 0
             k += 1
