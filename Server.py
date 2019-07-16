@@ -152,8 +152,13 @@ def map_call(myPC, userdata, msg):
     position_end_1["i"] = int(message[3])
     position_end_1["j"] = int(message[4])
     position_1["direct"] = int(message[5])
-    walls1 = message[6]
-    cubes1 = message[7]
+    position_2["i"] = int(message[6])
+    position_2["j"] = int(message[7])
+    position_end_2["i"] = int(message[8])
+    position_end_2["j"] = int(message[9])
+    position_2["direct"] = int(message[10])
+    walls1 = message[11]
+    cubes1 = message[12]
 
     walls1 = walls1[1:len(walls1)-1]
     walls = []
@@ -217,7 +222,7 @@ myPC.on_disconnect = on_disconnect
 myPC.on_unsubscribe = on_unsubscribe
 
 #  connection
-myPC.connect("10.42.0.1", 1883, 60)
+myPC.connect("192.168.43.152", 1883, 60)
 myPC.subscribe("ConnStat/", 2)
 myPC.subscribe("Map/", 2)
 myPC.message_callback_add("ConnStat/", conn_call)
