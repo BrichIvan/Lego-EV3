@@ -29,11 +29,15 @@ class Field(object):
 
     def build_map(self):
         k = 1
-        fl = 1
+        fl = 0
         for i in range(self.rang):
             for j in range(self.rang):
                 if self.field[i][j] > 1:
                     self.field[i][j] = -2
+        for i in range(self.rang):
+            for j in range(self.rang):
+            	if self.field[i][j] == -1:
+            		fl = 1
         while fl:
             for i in range(self.rang):
                 for j in range(self.rang):
@@ -44,7 +48,7 @@ class Field(object):
                                 if [i - 1, j] in self.ano:
                                     self.field[i - 1, j] = self.field[i, j] + 3
                                 else:
-                                    self.field[i - 1, j] = self.field[i, j] + 1
+                                	self.field[i - 1, j] = self.field[i, j] + 1
                             if self.field[i - 1, j] == -1:
                                 fl = 0
                         if i < self.rang - 1:
@@ -53,7 +57,7 @@ class Field(object):
                                 if [i + 1, j] in self.ano:
                                     self.field[i + 1, j] = self.field[i, j] + 3
                                 else:
-                                    self.field[i + 1, j] = self.field[i, j] + 1
+                                	self.field[i + 1, j] = self.field[i, j] + 1
                             if self.field[i + 1, j] == -1:
                                 fl = 0
                         if j > 0:
@@ -62,7 +66,7 @@ class Field(object):
                                 if [i, j - 1] in self.ano:
                                     self.field[i, j - 1] = self.field[i, j] + 3
                                 else:
-                                    self.field[i, j - 1] = self.field[i, j] + 1
+                                	self.field[i, j - 1] = self.field[i, j] + 1
                             if self.field[i, j - 1] == -1:
                                 fl = 0
                         if j < self.rang - 1:
@@ -71,7 +75,7 @@ class Field(object):
                                 if [i, j + 1] in self.ano:
                                     self.field[i, j + 1] = self.field[i, j] + 3
                                 else:
-                                    self.field[i, j + 1] = self.field[i, j] + 1
+                                	self.field[i, j + 1] = self.field[i, j] + 1
                             if self.field[i, j + 1] == -1:
                                 fl = 0
             k += 1
@@ -80,9 +84,13 @@ class Field(object):
         i_cur = self.i_fin
         j_cur = self.j_fin
         self.route = []
-        self.route.append([i_cur, j_cur])
         direct = (self.direct + 2) % 4
-        min = 0
+        min = 1
+        for i in range(self.rang):
+            for j in range(self.rang):
+            	if self.field[i][j] == -1:
+            		min = 0
+            		self.route.append([i_cur, j_cur])
         while min != 1:
             min = 0
 
@@ -195,7 +203,7 @@ class Field(object):
 
     def build_route(self):
         self.com = ''
-
+        
         for n in range(len(self.route) - 1):
 
             delta_i = self.route[n + 1][0] - self.route[n][0]
@@ -235,7 +243,7 @@ class Field(object):
             flaag = False
             self.turns_after_calibration += 1
             if self.turns_after_calibration > self.min_turns_for_calibration:
-            	self.turns_after_calibration = 0
+                self.turns_after_calibration = 0
                 if self.route[n + 1][0] > 0:
                     if self.field[self.route[n + 1][0] - 1, self.route[n + 1][1]] == -3:
                         self.turns_after_calibration = 0
