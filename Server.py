@@ -17,57 +17,93 @@ def on_message(myPC, userdata, msg):
         userdata["dist/1"] = a[0]
         userdata["angle/1"] = a[1]
         if message[0] < 225:
+            is_wall = False
             if position_1["direct"] == 0:
                 i_obstacle = position_1["i"] + 1
                 j_obstacle = position_1["j"]
-                map1.add_wall(position_1["i"] + 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
-                map2.add_wall(position_1["i"] + 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
+                if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map1.add_wall(position_1["i"] + 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
+                    map2.add_wall(position_1["i"] + 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
             if position_1["direct"] == 2:
                 i_obstacle = position_1["i"] - 1
                 j_obstacle = position_1["j"]
-                map1.add_wall(position_1["i"] - 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
-                map2.add_wall(position_1["i"] - 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
+                if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map1.add_wall(position_1["i"] - 1, position_1["j"], position_1["i"], position_1["j"], position_1["direct"])
+                    map2.add_wall(position_1["i"] - 1, position_1["j"], position_2["i"], position_2["j"], position_2["direct"])
             if position_1["direct"] == 1:
                 i_obstacle = position_1["i"]
                 j_obstacle = position_1["j"] + 1
-                map1.add_wall(position_1["i"], position_1["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
-                map2.add_wall(position_1["i"], position_1["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
+                if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map1.add_wall(position_1["i"], position_1["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
+                    map2.add_wall(position_1["i"], position_1["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
             if position_1["direct"] == 3:
                 i_obstacle = position_1["i"]
                 j_obstacle = position_1["j"] - 1
-                map1.add_wall(position_1["i"], position_1["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
-                map2.add_wall(position_1["i"], position_1["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
-            walls.append([i_obstacle, j_obstacle])
-            wall_send = 1
-            struct_route(map1, map2)
+                if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map1.add_wall(position_1["i"], position_1["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
+                    map2.add_wall(position_1["i"], position_1["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
+            if is_wall:
+                walls.append([i_obstacle, j_obstacle])
+                wall_send = 1
+                struct_route(map1, map2)
     if msg.topic == "Sensors/2":
         ready_for_action["Robot2"] = 1
         userdata["dist/2"] = a[0]
         userdata["angle/2"] = a[1]
         if message[0] < 225:
+            is_wall = False
             if position_2["direct"] == 0:
                 i_obstacle = position_2["i"] + 1
                 j_obstacle = position_2["j"]
-                map2.add_wall(position_2["i"] + 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
-                map1.add_wall(position_2["i"] + 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
+                if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map2.add_wall(position_2["i"] + 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
+                    map1.add_wall(position_2["i"] + 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
             if position_2["direct"] == 2:
                 i_obstacle = position_2["i"] - 1
                 j_obstacle = position_2["j"]
-                map2.add_wall(position_2["i"] - 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
-                map1.add_wall(position_2["i"] - 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
+                if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map2.add_wall(position_2["i"] - 1, position_2["j"], position_2["i"], position_2["j"], position_2["direct"])
+                    map1.add_wall(position_2["i"] - 1, position_2["j"], position_1["i"], position_1["j"], position_1["direct"])
             if position_2["direct"] == 1:
                 i_obstacle = position_2["i"]
                 j_obstacle = position_2["j"] + 1
-                map2.add_wall(position_2["i"], position_2["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
-                map1.add_wall(position_2["i"], position_2["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
+                if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map2.add_wall(position_2["i"], position_2["j"] + 1, position_2["i"], position_2["j"], position_2["direct"])
+                    map1.add_wall(position_2["i"], position_2["j"] + 1, position_1["i"], position_1["j"], position_1["direct"])
             if position_2["direct"] == 3:
                 i_obstacle = position_2["i"]
                 j_obstacle = position_2["j"] - 1
-                map2.add_wall(position_2["i"], position_2["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
-                map1.add_wall(position_2["i"], position_2["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
-            walls.append([i_obstacle, j_obstacle])
-            wall_send = 1
-            struct_route(map1, map2)
+                if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
+                    pass
+                else:
+                    is_wall = True
+                    map2.add_wall(position_2["i"], position_2["j"] - 1, position_2["i"], position_2["j"], position_2["direct"])
+                    map1.add_wall(position_2["i"], position_2["j"] - 1, position_1["i"], position_1["j"], position_1["direct"])
+            if is_wall:
+                walls.append([i_obstacle, j_obstacle])
+                wall_send = 1
+                struct_route(map1, map2)
     print(userdata)
 
 
@@ -190,7 +226,7 @@ myPC.loop_start()
 
 print("Waiting until connection...")
 while conn["Robot1"] == 0 or conn["Robot2"] == 0 or conn["Viz"] == 0:
-   pass
+    pass
 
 myPC.message_callback_remove("ConnStat/")
 print("All robots connected!")
@@ -203,7 +239,7 @@ init_set = 0
 rang = 4  # 200x200 cm
 #  set starting point and direction
 position_1 = {"i": 0, "j": 0, "direct": 0}
-position_2 = {"i": 0, "j": 0, "direct": 0}
+position_2 = {"i": 1, "j": 0, "direct": 0}
 #  set end points
 position_end_1 = {"i": 2, "j": 2}
 position_end_2 = {"i": 0, "j": 1}
@@ -211,6 +247,11 @@ position_end_2 = {"i": 0, "j": 1}
 walls = []
 cubes = []
 wall_send = 0
+#  set previous position (for anti-crash)
+previous_1 = {"i": 0, "j": 0}
+previous_2 = {"i": 1, "j": 0}
+previous_1["i"] = position_1["i"]
+previous_1["j"] = position_1["j"]
 
 while init_set == 0:
    pass
@@ -230,27 +271,25 @@ map2.find_route()
 map2.build_route()
 struct_route(map1, map2)
 
-print(map1.field)
-print()
-print(map1.route)
-print()
-print(queue1)
-print()
-
 #  main cycle
 while True:
 
     if ready_for_action["Robot1"] == 1:
         if len(queue1) > 0:
             ready_for_action["Robot1"] = 0
-            k = queue1.pop()
+            k = queue1[len(queue1)-1]
+            collision = False
             if k == "1 20" and position_1["direct"] == 0:
+                previous_1["i"] = position_1["i"]
                 position_1["i"] += 1
             elif k == "1 20" and position_1["direct"] == 2:
+                previous_1["i"] = position_1["i"]
                 position_1["i"] += -1
             elif k == "1 20" and position_1["direct"] == 1:
+                previous_1["j"] = position_1["j"]
                 position_1["j"] += 1
             elif k == "1 20" and position_1["direct"] == 3:
+                previous_1["j"] = position_1["j"]
                 position_1["i"] += -1
             elif k == "0 90":
                 if position_1["direct"] == 0:
@@ -262,20 +301,36 @@ while True:
                     position_1["direct"] = 0
                 else:
                     position_1["direct"] += 1
-            myPC.publish("Command/1", k, 2)
-            myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]), 2)
+
+            if k == "1 20":
+                if ((position_1["i"] == previous_2["i"]) and (position_1["j"] == previous_2["j"])) or ((position_1["i"] == position_2["i"]) and (position_1["j"] == position_2["j"])):
+                    collision = True
+                    ready_for_action["Robot1"] = 1
+
+            if not collision:
+                queue1.pop()
+                myPC.publish("Command/1", k, 2)
+                myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]), 2)
+        else:
+            previous_1["i"] = position_1["i"]
+            previous_1["j"] = position_1["j"]
 
     if ready_for_action["Robot2"] == 1:
         if len(queue2) > 0:
             ready_for_action["Robot2"] = 0
-            k = queue2.pop()
+            k = queue1[len(queue1)-1]
+            collision = False
             if k == "1 20" and position_2["direct"] == 0:
+                previous_2["i"] = position_2["i"]
                 position_2["i"] += 1
             elif k == "1 20" and position_2["direct"] == 2:
+                previous_2["i"] = position_2["i"]
                 position_2["i"] += -1
             elif k == "1 20" and position_2["direct"] == 1:
+                previous_2["j"] = position_2["j"]
                 position_2["j"] += 1
             elif k == "1 20" and position_2["direct"] == 3:
+                previous_2["j"] = position_2["j"]
                 position_2["i"] += -1
             elif k == "0 90":
                 if position_2["direct"] == 0:
@@ -287,8 +342,19 @@ while True:
                     position_2["direct"] = 0
                 else:
                     position_2["direct"] += 1
-            myPC.publish("Command/2", k, 2)
-            myPC.publish("Position/2", str(position_2["i"]) + " " + str(position_2["j"]), 2)
+            
+            if k == "1 20":
+                if ((position_2["i"] == previous_1["i"]) and (position_2["j"] == previous_1["j"])) or ((position_2["i"] == position_1["i"]) and (position_2["j"] == position_1["j"])):
+                    collision = True
+                    ready_for_action["Robot2"] = 1
+
+            if not collision:
+                queue2.pop()
+                myPC.publish("Command/2", k, 2)
+                myPC.publish("Position/2", str(position_2["i"]) + " " + str(position_2["j"]), 2)
+        else:
+            previous_1["i"] = position_1["i"]
+            previous_1["j"] = position_1["j"]
 
     if wall_send == 1:
         wall_send = 0
