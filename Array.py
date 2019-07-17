@@ -29,7 +29,8 @@ class Field(object):
         self.direct = direct
         self.com = ''
         self.turns_after_calibration = 0
-        self.min_turns_for_calibration = 2
+        self.min_turns_for_calibration = 3
+        print("Min turns for calibration: ", self.min_turns_for_calibration)
 
     #  направления: 0 - вниз, 1 - вправо, 2 - вверх, 3 - влево
 
@@ -249,7 +250,6 @@ class Field(object):
             flaag = False
             self.turns_after_calibration += 1
             if self.turns_after_calibration > self.min_turns_for_calibration:
-                self.turns_after_calibration = 0
                 if self.route[n + 1][0] > 0:
                     if self.field[self.route[n + 1][0] - 1, self.route[n + 1][1]] == -3:
                         self.turns_after_calibration = 0
@@ -276,6 +276,7 @@ class Field(object):
                         flaag = True
 
             if flaag:
+                self.turns_after_calibration = 0
                 delta_i = self.route[n + 1][0] - i_cube
                 delta_j = self.route[n + 1][1] - j_cube
                 if delta_i == -1:

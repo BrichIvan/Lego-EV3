@@ -21,24 +21,32 @@ def on_message(myPC, userdata, msg):
                 i_obstacle = position_1["i"] + 1
                 j_obstacle = position_1["j"]
                 is_wall = True
+                if (map1.field[i_obstacle][j_obstacle] == 0) or (map1.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
                     is_wall = False
             if position_1["direct"] == 2:
                 i_obstacle = position_1["i"] - 1
                 j_obstacle = position_1["j"]
                 is_wall = True
+                if (map1.field[i_obstacle][j_obstacle] == 0) or (map1.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
                     is_wall = False
             if position_1["direct"] == 1:
                 i_obstacle = position_1["i"]
                 j_obstacle = position_1["j"] + 1
                 is_wall = True
+                if (map1.field[i_obstacle][j_obstacle] == 0) or (map1.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
                     is_wall = False
             if position_1["direct"] == 3:
                 i_obstacle = position_1["i"]
                 j_obstacle = position_1["j"] - 1
                 is_wall = True
+                if (map1.field[i_obstacle][j_obstacle] == 0) or (map1.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_2["i"]) and (j_obstacle == previous_2["j"])) or ((i_obstacle == position_2["i"]) and (j_obstacle == position_2["j"])):
                     is_wall = False
             if is_wall:
@@ -58,24 +66,32 @@ def on_message(myPC, userdata, msg):
                 i_obstacle = position_2["i"] + 1
                 j_obstacle = position_2["j"]
                 is_wall = True
+                if (map2.field[i_obstacle][j_obstacle] == 0) or (map2.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
                     is_wall = False
             if position_2["direct"] == 2:
                 i_obstacle = position_2["i"] - 1
                 j_obstacle = position_2["j"]
                 is_wall = True
+                if (map2.field[i_obstacle][j_obstacle] == 0) or (map2.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
                     is_wall = False
             if position_2["direct"] == 1:
                 i_obstacle = position_2["i"]
                 j_obstacle = position_2["j"] + 1
                 is_wall = True
+                if (map2.field[i_obstacle][j_obstacle] == 0) or (map2.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
                     is_wall = False
             if position_2["direct"] == 3:
                 i_obstacle = position_2["i"]
                 j_obstacle = position_2["j"] - 1
                 is_wall = True
+                if (map2.field[i_obstacle][j_obstacle] == 0) or (map2.field[i_obstacle][j_obstacle] == -3):
+                    is_wall = False
                 if ((i_obstacle == previous_1["i"]) and (j_obstacle == previous_1["j"])) or ((i_obstacle == position_1["i"]) and (j_obstacle == position_1["j"])):
                     is_wall = False
             if is_wall:
@@ -115,9 +131,13 @@ def conn_call(myPC, userdata, msg):
     if message == "1":
         conn["Robot1"] = 1
         print("Robot 1 connected")
+        if conn["Robot2"] == 2:
+            print("All robots connected!")
     if message == "2":
         conn["Robot2"] = 2
         print("Robot 2 connected")
+        if conn["Robot1"] == 1:
+            print("All robots connected!")
     if message == "Viz":
         conn["Viz"] = 100
         print("Vizualization connected")
@@ -170,8 +190,30 @@ def map_call(myPC, userdata, msg):
         posit = cubes1.find(", ")
         if posit == 0:
             cubes1 = cubes1[posit + 2:len(cubes1)]
-        
+    
     init_set = 1
+
+def show_call(myPC, userdata, msg):
+    global map1, map2
+    message = msg.payload.decode()
+    if message == "1":
+        map1.build_map()
+        map1.find_route()
+        map1.build_route()
+        print("MAP 1:")
+        print(map1.field)
+        print(map1.route)
+        print(queue1)
+        print()
+    if message == "2":
+        map2.build_map()
+        map2.find_route()
+        map2.build_route()
+        print("MAP 2:")
+        print(map2.field)
+        print(map2.route)
+        print(queue2)
+        print()
 #  ------------------------------
 
 def struct_route(map1, map2):
@@ -204,25 +246,16 @@ myPC.on_unsubscribe = on_unsubscribe
 
 #  connection
 myPC.connect("192.168.43.152", 1883, 60)
+#myPC.connect("10.42.0.1", 1883, 60)
 myPC.subscribe("ConnStat/", 2)
 myPC.subscribe("Map/", 2)
 myPC.message_callback_add("ConnStat/", conn_call)
 myPC.message_callback_add("Map/", map_call)
 myPC.loop_start()
 
-print("Waiting until connection...")
-while conn["Robot1"] == 0 or conn["Robot2"] == 0 or conn["Viz"] == 0:
-    pass
-
-myPC.message_callback_remove("ConnStat/")
-print("All robots connected!")
-
-myPC.subscribe("Sensors/1", 2)
-myPC.subscribe("Sensors/2", 2)
-
 #  set matrix size. one cell is 20x20 cm
 init_set = 0
-rang = 4  # 200x200 cm
+rang = 10  # 200x200 cm
 #  set starting point and direction
 position_1 = {"i": 0, "j": 0, "direct": 0}
 position_2 = {"i": 1, "j": 0, "direct": 0}
@@ -239,11 +272,23 @@ previous_2 = {"i": 1, "j": 0}
 previous_1["i"] = position_1["i"]
 previous_1["j"] = position_1["j"]
 
+print("Waiting until connection...")
+while conn["Robot1"] == 0 or conn["Robot2"] == 0 or conn["Viz"] == 0:
+    pass
+
+myPC.message_callback_remove("ConnStat/")
+print("All connected!")
+
+myPC.subscribe("Sensors/1", 2)
+myPC.subscribe("Sensors/2", 2)
+
 print("Waiting for Viz data")
 while init_set == 0:
    pass
 
 myPC.unsubscribe("Map/")
+myPC.message_callback_add("Show/", show_call)
+myPC.subscribe("Show/", 2)
 
 previous_1["i"] = position_1["i"]
 previous_1["j"] = position_1["j"]
@@ -251,7 +296,6 @@ previous_1["j"] = position_1["j"]
 print("Vizualization imported")
 ready_for_action["Robot1"] = 1
 ready_for_action["Robot2"] = 1
-cubes = [[4, 4]]
 #  initial route sending
 map1 = Field(rang, position_1["i"], position_1["j"], position_end_1["i"], position_end_1["j"], position_1["direct"], walls, cubes)
 map1.build_map()
@@ -321,7 +365,7 @@ while True:
             if not collision:
                 queue1.pop()
                 myPC.publish("Command/1", k, 2)
-                myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]), 2)
+                myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]) + " " + str(position_1["direct"]), 2)
             print("Position 1:")
             print(position_1["i"], position_1["j"])
 
@@ -374,7 +418,7 @@ while True:
             if not collision:
                 queue2.pop()
                 myPC.publish("Command/2", k, 2)
-                myPC.publish("Position/2", str(position_2["i"]) + " " + str(position_2["j"]), 2)
+                myPC.publish("Position/2", str(position_2["i"]) + " " + str(position_2["j"]) + " " + str(position_2["direct"]), 2)
             print("Position 2:")
             print(position_2["i"], position_2["j"])
 
