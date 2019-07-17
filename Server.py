@@ -1,6 +1,5 @@
 from Array import Field
 import paho.mqtt.client as mqtt
-import time
 
 #  MQTT functions
 def on_connect(myPC, userdata, flags, rc):
@@ -252,7 +251,7 @@ previous_1["j"] = position_1["j"]
 print("Vizualization imported")
 ready_for_action["Robot1"] = 1
 ready_for_action["Robot2"] = 1
-
+cubes = [[4, 4]]
 #  initial route sending
 map1 = Field(rang, position_1["i"], position_1["j"], position_end_1["i"], position_end_1["j"], position_1["direct"], walls, cubes)
 map1.build_map()
@@ -284,14 +283,18 @@ while True:
             collision = False
             if k == "1 20" and position_1["direct"] == 0:
                 previous_1["i"] = position_1["i"]
+                previous_1["j"] = position_1["j"]
                 position_1["i"] += 1
             elif k == "1 20" and position_1["direct"] == 2:
                 previous_1["i"] = position_1["i"]
+                previous_1["j"] = position_1["j"]
                 position_1["i"] += -1
             elif k == "1 20" and position_1["direct"] == 1:
+                previous_1["i"] = position_1["i"]
                 previous_1["j"] = position_1["j"]
                 position_1["j"] += 1
             elif k == "1 20" and position_1["direct"] == 3:
+                previous_1["i"] = position_1["i"]
                 previous_1["j"] = position_1["j"]
                 position_1["j"] += -1
             elif k == "0 90":
@@ -305,10 +308,12 @@ while True:
                 else:
                     position_1["direct"] += 1
 
-            #if k == "1 20":
-            #    if ((position_1["i"] == previous_2["i"]) and (position_1["j"] == previous_2["j"])) or ((position_1["i"] == position_2["i"]) and (position_1["j"] == position_2["j"])):
-            #        collision = True
-            #        ready_for_action["Robot1"] = 1
+            if k == "1 20":
+                if ((position_1["i"] == previous_2["i"]) and (position_1["j"] == previous_2["j"])) or ((position_1["i"] == position_2["i"]) and (position_1["j"] == position_2["j"])):
+                    collision = True
+                    position_1["i"] = previous_1["i"]
+                    position_1["j"] = previous_1["j"]
+                    ready_for_action["Robot1"] = 1
             elif k == "5 1" or k == "0 90" or k == "0 -90":
                 previous_1["i"] = position_1["i"]
                 previous_1["j"] = position_1["j"]   
@@ -317,6 +322,8 @@ while True:
                 queue1.pop()
                 myPC.publish("Command/1", k, 2)
                 myPC.publish("Position/1", str(position_1["i"]) + " " + str(position_1["j"]), 2)
+            print("Position 1:")
+            print(position_1["i"], position_1["j"])
 
         else:
             previous_1["i"] = position_1["i"]
@@ -329,14 +336,18 @@ while True:
             collision = False
             if k == "1 20" and position_2["direct"] == 0:
                 previous_2["i"] = position_2["i"]
+                previous_2["j"] = position_2["j"]
                 position_2["i"] += 1
             elif k == "1 20" and position_2["direct"] == 2:
                 previous_2["i"] = position_2["i"]
+                previous_2["j"] = position_2["j"]
                 position_2["i"] += -1
             elif k == "1 20" and position_2["direct"] == 1:
+                previous_2["i"] = position_2["i"]
                 previous_2["j"] = position_2["j"]
                 position_2["j"] += 1
             elif k == "1 20" and position_2["direct"] == 3:
+                previous_2["i"] = position_2["i"]
                 previous_2["j"] = position_2["j"]
                 position_2["j"] += -1
             elif k == "0 90":
@@ -350,10 +361,12 @@ while True:
                 else:
                     position_2["direct"] += 1
             
-            #if k == "1 20":
-            #    if ((position_2["i"] == previous_1["i"]) and (position_2["j"] == previous_1["j"])) or ((position_2["i"] == position_1["i"]) and (position_2["j"] == position_1["j"])):
-            #        collision = True
-            #        ready_for_action["Robot2"] = 1
+            if k == "1 20":
+                if ((position_2["i"] == previous_1["i"]) and (position_2["j"] == previous_1["j"])) or ((position_2["i"] == position_1["i"]) and (position_2["j"] == position_1["j"])):
+                    collision = True
+                    position_2["i"] = previous_2["i"]
+                    position_2["j"] = previous_2["j"]
+                    ready_for_action["Robot2"] = 1
             elif k == "5 1" or k == "0 90" or k == "0 -90":
                 previous_2["i"] = position_2["i"]
                 previous_2["j"] = position_2["j"]   
@@ -362,6 +375,9 @@ while True:
                 queue2.pop()
                 myPC.publish("Command/2", k, 2)
                 myPC.publish("Position/2", str(position_2["i"]) + " " + str(position_2["j"]), 2)
+            print("Position 2:")
+            print(position_2["i"], position_2["j"])
+
         else:
             previous_2["i"] = position_2["i"]
             previous_2["j"] = position_2["j"]

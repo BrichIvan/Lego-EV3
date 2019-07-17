@@ -14,6 +14,12 @@ class Field(object):
         for i in range(self.rang):
             for j in range(self.rang):
                 self.field[i][j] = -2
+        for i in range(self.rang):
+            self.field[i][0] = 0
+            self.field[i][self.rang-1] = 0
+        for j in range(self.rang):
+            self.field[0][j] = 0
+            self.field[self.rang-1][j] = 0
         self.field[self.i_st, self.j_st] = 1
         self.field[self.i_fin, self.j_fin] = -1
         for i in walls:
@@ -23,7 +29,7 @@ class Field(object):
         self.direct = direct
         self.com = ''
         self.turns_after_calibration = 0
-        self.min_turns_for_calibration = 3
+        self.min_turns_for_calibration = 2
 
     #  направления: 0 - вниз, 1 - вправо, 2 - вверх, 3 - влево
 
