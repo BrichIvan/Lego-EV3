@@ -55,10 +55,13 @@ class Field(object):
             self.walls.append([0, j])
             self.walls.append([self.rang-1, j])
 
-        self.field[self.i_st, self.j_st] = 1
         self.field[self.i_fin, self.j_fin] = -1
+        self.field[self.i_st, self.j_st] = 1
         for i in self.walls:
             self.field[i[0]][i[1]] = 0
+
+        for i in self.cubes:
+            self.field[i[0]][i[1]] = -3
 
 
     def build_map(self):

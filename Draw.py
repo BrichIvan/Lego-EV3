@@ -64,9 +64,15 @@ myPC.loop_start()
 root = Tk()
 root2 = Tk()
 root3 = Tk()
+root4 = Tk()
 root.bind("<Escape>", exit)
 root2.bind("<Escape>", exit)
 root3.bind("<Escape>", exit)
+root4.bind("<Escape>", exit)
+root.title('Valenteeeeeen')
+root2.title('Valenteeeeeen')
+root3.title('Valenteeeeeen')
+root4.title('Valenteeeeeen')
 
 
 
@@ -78,7 +84,8 @@ def exit():
 cubes = []
 #wols = []
 
-cubes.append([4, 4])
+cubes.append([5, 7])
+cubes.append([6, 3])
 
 '''wols.append([3, 2])
 wols.append([4, 2])
@@ -128,14 +135,24 @@ class Mapping(object):
         self.dir_cur_1 = 0
         self.dir_cur_2 = 0
 
-        self.wols = []
+        self.wols = [[1, 5], [3, 3], [5, 1], [5, 2], [5, 3], [7, 6], [7, 5]]
         #self.cubes = []
 
         self.vizited1 = []
         self.vizited2 = []
 
+    def choose_direction(self, dir):
+        if self.st == 0:
+            self.dir_cur_1 = dir
+        else:
+            self.dir_cur_2 = dir
+            self.but_dir0.destroy()
+            self.but_dir1.destroy()
+            self.but_dir2.destroy()
+            self.but_dir3.destroy()
+            #root4.destroy()
+
     def add_start(self, i1, j1):
-        print("okay")
         self.b1[i1][j1]['bg'] = "green"
         if self.st == 0:
             self.b1[i1][j1]['text'] = "1 start"
@@ -147,8 +164,17 @@ class Mapping(object):
             self.j_st2 = j1
         self.but_add_start.destroy()
         self.but_add_finish.destroy()
-
         self.st += 1
+
+        self.but_dir0 = Button(root4, text="0", bg="blue", command=lambda dir=0: self.choose_direction(dir))
+        self.but_dir0.grid(column=2, row=3)
+        self.but_dir1 = Button(root4, text="1", bg="blue", command=lambda dir=1: self.choose_direction(dir))
+        self.but_dir1.grid(column=3, row=2)
+        self.but_dir2 = Button(root4, text="2", bg="blue", command=lambda dir=2: self.choose_direction(dir))
+        self.but_dir2.grid(column=2, row=1)
+        self.but_dir3 = Button(root4, text="3", bg="blue", command=lambda dir=3: self.choose_direction(dir))
+        self.but_dir3.grid(column=1, row=2)
+
 
     def add_finish(self, i1, j1):
         self.b1[i1][j1]['bg'] = "orange"
@@ -176,37 +202,16 @@ class Mapping(object):
             self.but_add_finish.pack()
 
 
-    '''def add_obstacle(self, i_obstacle, j_obstacle):
-        print("NEW OBSTACLE")
-        self.wols.append([i_obstacle, j_obstacle])
-        print(self.wols[len(self.wols)-1])
-        self.b1[i_obstacle][j_obstacle]['bg'] = "red"
-        self.build_map()'''
-       # self.b1[i_obstacle][j_obstacle]['bg'] = "red"
     def add_obstacle(self, i_obstacle, j_obstacle):
         print("NEW OBSTACLE")
-
-
-
         map1.add_wall(i_obstacle, j_obstacle, i_cur_1, j_cur_1, self.dir_cur_1)
         map2.add_wall(i_obstacle, j_obstacle, i_cur_2, j_cur_2, self.dir_cur_2)
 
-
-
         self.wols.append([i_obstacle, j_obstacle])
 
         print(self.wols[len(self.wols)-1])
-        #self.b1[i_obstacle][j_obstacle]['bg'] = "red"
 
-        #map1.build_map()
-        #map1.find_route()
-        #map1.build_route()
-
-        #map2.build_map()
-        #map2.find_route()
-        #map2.build_route()
-
-        print("Map1")
+        '''print("Map1")
         print(map1.route)
         print(map1.field)
         print(map1.com)
@@ -214,81 +219,49 @@ class Mapping(object):
         print("Map2")
         print(map2.route)
         print(map2.field)
-        print(map2.com)
-        '''
-        for n in range(1, len(map1.route) - 1):
-            print("LULZ1")
-            self.b1[map1.route[n][0]][map1.route[n][1]]['bg'] = "lime"
-            print("LULZ3")
+        print(map2.com)'''
 
-        for n in range(len(self.wols)):
-            print("LULZ2")
-            self.b1[self.wols[n][0]][self.wols[n][1]]['bg'] = "red"
-
-        for n in range(len(cubes)):
-            self.b1[cubes[n][0]][cubes[n][1]]['bg'] = "black"
-
-        for n in range(len(vizited1)):
-            self.b1[vizited1[n][0]][vizited1[n][1]]['bg'] = '#CD853F'
-        for n in range(len(vizited2)):
-            self.b1[vizited2[n][0]][vizited2[n][1]]['bg'] = "grey"
-
-        
-        '''
-        self.rebuild_map()
-        #self.but_build.invoke()
-        #root2.after(0, lambda: self.build_map())
 
     def add_current1(self, i_cur_1, j_cur_1):
-        print("12345")
-        #print(str(self.tr))
         r = int(self.tr)
-        print("add_current1 okay")
+        print("NEW POSITION 1")
+        print("[",i_cur_1, ", ", j_cur_1,"]")
         for i in range(r):
             for j in range(r):
                 if map1.field[i][j] == 1:
                     map1.field[i][j] = -2
-                    self.vizited1.append(i, j)
+                    self.vizited1.append([i, j])
         map1.field[i_cur_1][j_cur_1] = 1
         self.i_st1 = i_cur_1
         self.j_st1 = j_cur_1
-        self.rebuild_map
-        #self.b1[i_cur_1][j_cur_1] = Button(root2, bg='#F08080')
 
 
     def add_current2(self, i_cur_2, j_cur_2):
         r = int(self.tr)
-        print("add_current2 okay")
+        print("NEW POSITION 2")
+        print("[", i_cur_2, ", ", j_cur_2, "]")
         for i in range(r):
             for j in range(r):
                 if map2.field[i][j] == 1:
                     map2.field[i][j] = -2
-                    self.vizited2.append(i, j)
+                    self.vizited2.append([i, j])
         map2.field[i_cur_2][j_cur_2] = 1
         self.i_st2 = i_cur_2
         self.j_st2 = j_cur_2
-        self.rebuild_map
-        #self.b1[i_cur_2][j_cur_2] = Button(root2, bg='#FF69B4')
+
 
     def clear_m(self):
         r = int(self.tr)
         for i in range(r):
             for j in range(r):
                 self.b1[i][j].config(bg="yellow")
-        '''self.b1 = [[0 for i in range(r)] for j in range(r)]
-        for i in range(r):
-            for j in range(r):
-                self.b1[i][j] = Button(root2, bg="yellow", width=4, height=4,
-                                       command=lambda i1=i, j1=j: self.Choose(i1, j1))
-                self.b1[i][j].grid(column=j, row=i)'''
 
         for n in range(len(self.wols)):
             self.b1[self.wols[n][0]][self.wols[n][1]].config(bg="red")
-            #changes(self.b1[self.wols[n][0]][self.wols[n][1]], "red")
 
         for n in range(len(cubes)):
             self.b1[cubes[n][0]][cubes[n][1]].config(bg="black")
-            #changes(self.b1[self.cubes[n][0]][self.cubes[n][1]], "black")
+
 
     def rebuild_map(self):
         self.clear_m()
@@ -304,91 +277,13 @@ class Mapping(object):
         map2.i_fin = self.i_fin2
         map2.j_fin = self.j_fin2
 
-        print('123'+str(map1.i_st)+str(map1.j_st)+str(self.i_st1)+str(self.j_st1))
+        print(str(map1.i_st)+str(map1.j_st)+str(self.i_st1)+str(self.j_st1))
 
         map1.setup()
         map2.setup()
 
-        print('123' + str(map1.i_st) + str(map1.j_st) + str(self.i_st1) + str(self.j_st1))
+        print(str(map1.i_st) + str(map1.j_st) + str(self.i_st1) + str(self.j_st1))
 
-        map1.build_map()
-        map1.find_route()
-        map1.build_route()
-
-        print(map1.route)
-        print(map1.field)
-        print(map1.com)
-
-        for n in range(1, len(map1.route) - 1):
-            #print("before")
-            self.b1[map1.route[n][0]][map1.route[n][1]].config(bg="lime")
-            #changes(self.b1[map1.route[n][0]][map1.route[n][1]], "lime")
-            #print("AFTER")
-
-        map2.ano = map1.route
-        map2.build_map()
-        map2.find_route()
-        map2.build_route()
-
-        print(map2.ano)
-        print(map2.route)
-        print(map2.field)
-        print(map2.com)
-
-        for n in range(1, len(map2.route) - 1):
-            self.b1[map2.route[n][0]][map2.route[n][1]].config(bg="olive")
-            #changes(self.b1[map2.route[n][0]][map2.route[n][1]], "olive")
-
-        print(map1.field)
-        print(map2.field)
-
-        for n in range(len(self.wols)):
-            #print("LULZ")
-            self.b1[self.wols[n][0]][self.wols[n][1]].config(bg="red")
-            #changes(self.b1[self.wols[n][0]][self.wols[n][1]], "red")
-
-        for n in range(len(cubes)):
-            self.b1[cubes[n][0]][cubes[n][1]].config(bg="black")
-            #changes(self.b1[self.cubes[n][0]][self.cubes[n][1]], "black")
-
-        for n in range(len(self.vizited1)):
-            self.b1[self.vizited1[n][0]][self.vizited1[n][1]].config(bg='#CD853F')
-        for n in range(len(self.vizited2)):
-            self.b1[self.vizited2[n][0]][self.vizited2[n][1]].config(bg="grey")
-
-        self.b1[map1.i_st][map1.j_st]['bg'] = "green"
-        self.b1[map1.i_fin][map1.j_fin]['bg'] = "orange"
-        self.b1[map2.i_st][map2.j_st]['bg'] = "green"
-        self.b1[map2.i_fin][map2.j_fin]['bg'] = "orange"
-
-    def build_map(self):
-        global cubes
-        self.but_build_map['fg'] = "red"
-
-        #if self.tr == '':
-
-        r = int(self.tr)
-
-        map1.i_st = self.i_st1
-        map1.j_st = self.j_st1
-        map1.i_fin = self.i_fin1
-        map1.j_fin = self.j_fin1
-
-        map2.i_st = self.i_st2
-        map2.j_st = self.j_st2
-        map2.i_fin = self.i_fin2
-        map2.j_fin = self.j_fin2
-
-        #print(str(self.i_st2) + ' ' + str(self.j_st2))
-        #print(str(self.i_fin2) + ' ' + str(self.j_fin2))
-
-        map1.setup()
-        map2.setup()
-
-
-        a = str(r)+";"+str(self.i_st1)+";"+str(self.j_st1)+";"+str(self.i_fin1)+";"+str(self.j_fin1)+";"+str(self.dir_cur_1)+";" + str(self.i_st2) + ";" + str(self.j_st2) + ";" + str(self.i_fin2) + ";" + str(self.j_fin2) + ";" + str(self.dir_cur_2)+";"+str(self.wols)+";"+str(cubes)
-        print(a)
-        myPC.publish("Map/", a, 2)
         map1.build_map()
         map1.find_route()
         map1.build_route()
@@ -413,26 +308,72 @@ class Mapping(object):
         for n in range(1, len(map2.route) - 1):
             self.b1[map2.route[n][0]][map2.route[n][1]].config(bg="olive")
 
+        '''print(map1.field)
+        print(map2.field)'''
+
+        for n in range(len(self.wols)):
+            #print("LULZ")
+            self.b1[self.wols[n][0]][self.wols[n][1]].config(bg="red")
+
+        for n in range(len(cubes)):
+            self.b1[cubes[n][0]][cubes[n][1]].config(bg="black")
+            #changes(self.b1[self.cubes[n][0]][self.cubes[n][1]], "black")
+
+        for n in range(len(self.vizited1)):
+            self.b1[self.vizited1[n][0]][self.vizited1[n][1]].config(bg='#CD853F')
+        for n in range(len(self.vizited2)):
+            self.b1[self.vizited2[n][0]][self.vizited2[n][1]].config(bg="grey")
+
+        self.b1[map1.i_fin][map1.j_fin]['bg'] = "orange"
+        self.b1[map1.i_st][map1.j_st]['bg'] = "green"
+        self.b1[map2.i_fin][map2.j_fin]['bg'] = "orange"
+        self.b1[map2.i_st][map2.j_st]['bg'] = "green"
+
+    def build_map(self):
+        global cubes
+        self.but_build_map['fg'] = "red"
+
+        r = int(self.tr)
+
+        map1.i_st = self.i_st1
+        map1.j_st = self.j_st1
+        map1.i_fin = self.i_fin1
+        map1.j_fin = self.j_fin1
+
+        map2.i_st = self.i_st2
+        map2.j_st = self.j_st2
+        map2.i_fin = self.i_fin2
+        map2.j_fin = self.j_fin2
+
+        map1.setup()
+        map2.setup()
+
+        a = str(r)+";"+str(self.i_st1)+";"+str(self.j_st1)+";"+str(self.i_fin1)+";"+str(self.j_fin1)+";"+str(self.dir_cur_1)+";" + str(self.i_st2) + ";" + str(self.j_st2) + ";" + str(self.i_fin2) + ";" + str(self.j_fin2) + ";" + str(self.dir_cur_2)+";"+str(self.wols)+";"+str(cubes)
+        print(a)
+        myPC.publish("Map/", a, 2)
+        map1.build_map()
+        map1.find_route()
+        map1.build_route()
+
+        for n in range(1, len(map1.route) - 1):
+            self.b1[map1.route[n][0]][map1.route[n][1]].config(bg="lime")
+
+        map2.ano = map1.route
+        map2.build_map()
+        map2.find_route()
+        map2.build_route()
+
+        for n in range(1, len(map2.route) - 1):
+            self.b1[map2.route[n][0]][map2.route[n][1]].config(bg="olive")
+
 
         print(map1.field)
         print(map2.field)
         for n in range(len(self.wols)):
-            #print("LULZ")
             self.b1[self.wols[n][0]][self.wols[n][1]].config(bg='red')
 
         for n in range(len(cubes)):
             self.b1[cubes[n][0]][cubes[n][1]].config(bg='black')
-        '''
-        for n in range(len(vizited1)):
-            self.b1[vizited1[n][0]][vizited1[n][1]].config(bg='#CD853F')
-        for n in range(len(vizited2)):
-            self.b1[vizited2[n][0]][vizited2[n][1]].config(bg="grey")
-        '''
-        #self.but_build_map.destroy()
-        #self.but_put.destroy()
-
-
-
 
 
     def upload(self, event):
@@ -486,8 +427,8 @@ mainmenu.add_cascade(label="Файл", menu=filemenu)
 global map_obj
 map_obj = Mapping()
 
-#Mapping()
+
 root.mainloop()
-root2.mainloop()  # ???
+root2.mainloop()
 root3.mainloop()
 
